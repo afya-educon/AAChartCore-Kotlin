@@ -38,6 +38,7 @@ package com.github.aachartmodel.aainfographics.aachartcreator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.util.AttributeSet
 import android.webkit.JavascriptInterface
@@ -160,8 +161,13 @@ class AAChartView : WebView {
         contentHeight = 580f
         isClearBackgroundColor = false
         settings.javaScriptEnabled = true
+        // Só habilita a depuração de conteúdo do WebView quando o app hospedeiro
+        // é depurável (android:debuggable=true). Em builds release o flag é falso,
+        // então a depuração fica desligada em produção.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setWebContentsDebuggingEnabled(true)
+            val isHostAppDebuggable =
+                (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+            setWebContentsDebuggingEnabled(isHostAppDebuggable)
         }
         //把当前对象作为androidObject别名传递给js
         //js通过window.androidObject.androidMethod()就可以直接调用安卓的androidMethod方法
